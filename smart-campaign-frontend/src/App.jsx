@@ -13,7 +13,8 @@ function AppContent() {
   const { currentUser, isGuest } = useAuth()
   const [showLogin, setShowLogin] = useState(false)
   const [analysisResult, setAnalysisResult] = useState(null)
-
+  console.log('analysisResult:', analysisResult)
+  
   if (showLogin && !currentUser && !isGuest) {
     return <Login onBack={() => setShowLogin(false)} />
   }
