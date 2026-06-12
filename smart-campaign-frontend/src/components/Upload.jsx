@@ -452,7 +452,7 @@ export default function Upload({ onAnalysisComplete }) {
                     }
                   })
 
-                  const res = await fetch('https://smart-marketing-manager-production.up.railway.app/analyze', {
+                  const res = await fetch('https://MalakMohamed21-smart-campaign-backend.hf.space/analyze', {
                     method: 'POST',
                     body: formData
                   })
