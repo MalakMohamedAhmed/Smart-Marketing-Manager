@@ -1,0 +1,8 @@
+Campaign Name,Date,Amount Spent,Impressions,Clicks,Conversions,Revenue,Reach,Frequency,CPM,CTR,CPC,Budget,Objective,Target Audience,Language
+Summer Sale,2023-01-01,500,10000,900,45,2250,8000,1.25,50.0,0.09,0.56,1000,Conversion,Women 25-34,English
+Summer Sale,2023-01-02,480,9500,855,41,2050,7800,1.22,50.5,0.09,0.56,1000,Conversion,Women 25-34,English
+Summer Sale,2023-01-03,510,10200,918,47,2350,8100,1.26,50.0,0.09,0.56,1000,Conversion,Women 25-34,English
+Winter Drop,2023-01-01,300,7000,210,8,240,6000,1.17,42.9,0.03,1.43,600,Brand Awareness,Men 18-24,English
+Winter Drop,2023-01-02,290,6800,204,7,210,5900,1.15,42.6,0.03,1.42,600,Brand Awareness,Men 18-24,English
+Brand Boost,2023-01-01,1000,20000,1800,120,7200,16000,1.25,50.0,0.09,0.56,2000,Conversion,Millennials,English
+Brand Boost,2023-01-02,980,19500,1755,115,6900,15800,1.23,50.3,0.09,0.56,2000,Conversion,Millennials,English

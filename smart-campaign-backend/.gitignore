@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyc
+smart-campaign-backend/pipeline/__pycache__/
