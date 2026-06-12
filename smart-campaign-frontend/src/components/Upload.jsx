@@ -459,7 +459,7 @@ export default function Upload({ onAnalysisComplete }) {
                       })
                     }
 
-                    const res = await fetch('https://MalakMohamed21-smart-campaign-backend.hf.space/analyze', {
+                    const res = await fetch('https://malakmohamed21-smart-campaign-backend.hf.space/analyze', {
                       method: 'POST',
                       body: formData
                     })
