@@ -25,10 +25,7 @@ function AppContent() {
       <section id="upload"><Upload onAnalysisComplete={setAnalysisResult} /></section>
       <section id="dashboard"><Dashboard data={analysisResult} /></section>
       <section id="recommendations">
-        <Recommendations 
-          recommendations={analysisResult?.recommendations ?? []}
-          recSummary={analysisResult?.rec_summary ?? null}
-        />
+        <Recommendations data={analysisResult} />
       </section>
       <Footer />
     </div>
