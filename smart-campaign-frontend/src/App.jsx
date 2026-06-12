@@ -24,7 +24,12 @@ function AppContent() {
       <section id="features"><Features /></section>
       <section id="upload"><Upload onAnalysisComplete={setAnalysisResult} /></section>
       <section id="dashboard"><Dashboard data={analysisResult} /></section>
-      <section id="recommendations"><Recommendations data={analysisResult} /></section>
+      <section id="recommendations">
+        <Recommendations 
+          recommendations={analysisResult?.recommendations ?? []}
+          recSummary={analysisResult?.rec_summary ?? null}
+        />
+      </section>
       <Footer />
     </div>
   )

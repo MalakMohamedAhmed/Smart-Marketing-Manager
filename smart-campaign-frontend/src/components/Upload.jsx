@@ -7,6 +7,8 @@ const platforms = ["Facebook", "Google", "Instagram", "TikTok", "YouTube", "Twit
 
 const objectives = ["Brand Awareness", "Lead Generation", "Conversions / Sales", "Traffic / Website Visits", "App Installs", "Engagement"]
 
+
+
 const platformMappings = {
   Facebook: { 'Campaign Name': 'campaign_name', 'Amount Spent': 'spend', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Reach': 'reach', 'Frequency': 'frequency', 'CPM': 'cpm', 'CTR': 'ctr', 'CPC': 'cpc', 'Date': 'date', 'Budget': 'budget' },
   Google: { 'Campaign': 'campaign_name', 'Cost': 'spend', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'CTR': 'ctr', 'Avg. CPC': 'cpc', 'Date': 'date', 'Budget': 'budget' },
@@ -53,6 +55,8 @@ export default function Upload({ onAnalysisComplete }) {
   const [selectedObjective, setSelectedObjective] = useState('')
   const [dragOver, setDragOver] = useState(null)
   const [combinedPlatformColumn, setCombinedPlatformColumn] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
   const { saveAnalysis } = useAnalyses()
   const { currentUser } = useAuth()
 
@@ -432,53 +436,79 @@ export default function Upload({ onAnalysisComplete }) {
               </button>
               <button
                 onClick={async () => {
-                try {
-                  const formData = new FormData()
-                  selectedPlatforms.forEach(p => formData.append('platforms', p))
-                  formData.append('file_mode', 'one_per_platform')
+                  setIsLoading(true)
+                  setError(null)
+                  try {
+                    const formData = new FormData()
+                    selectedPlatforms.forEach(p => formData.append('platforms', p))
+                    formData.append('file_mode', fileMode === 'combined' ? 'one_for_all' : 'one_per_platform')
+                    formData.append('objective', selectedObjective)
 
-                  formData.append('objective', selectedObjective)
-
-                  
-                  // 1. Send the platform metadata lists
-                  selectedPlatforms.forEach(p => formData.append('platforms', p))
-                  formData.append('file_mode', 'one_per_platform')
-                  formData.append('objective', selectedObjective) // Sends your tracking goal to the backend
-
-                  // 2. Safely attach your actual CSV file streams
-                  selectedPlatforms.forEach(p => {
-                    if (uploadedFiles[p] && uploadedFiles[p].file) {
-                      formData.append(`file_${p.toLowerCase()}`, uploadedFiles[p].file) // ✅ Fixed: uploadedFiles[p].file
+                    if (fileMode === 'combined') {
+                      if (uploadedFiles['combined']?.file) {
+                        formData.append('file_all', uploadedFiles['combined'].file)
+                      }
+                      if (combinedPlatformColumn) {
+                        formData.append('platform_col', combinedPlatformColumn)
+                      }
+                    } else {
+                      selectedPlatforms.forEach(p => {
+                        if (uploadedFiles[p]?.file) {
+                          formData.append(`file_${p.toLowerCase()}`, uploadedFiles[p].file)
+                        }
+                      })
                     }
-                  })
 
-                  const res = await fetch('https://MalakMohamed21-smart-campaign-backend.hf.space/analyze', {
-                    method: 'POST',
-                    body: formData
-                  })
-                  const result = await res.json()
-                  onAnalysisComplete(result)
-
-                  if (currentUser) {
-                    await saveAnalysis({
-                      platforms: selectedPlatforms,
-                      objective: selectedObjective,
-                      filesSummary: selectedPlatforms.map(p => ({
-                        platform: p,
-                        rows: uploadedFiles[p]?.rows || 0,
-                        tier: fileValidation[p]?.tier || 0
-                      }))
+                    const res = await fetch('https://MalakMohamed21-smart-campaign-backend.hf.space/analyze', {
+                      method: 'POST',
+                      body: formData
                     })
+
+                    if (!res.ok) {
+                      const errData = await res.json()
+                      throw new Error(errData.message || errData.error || 'Analysis failed')
+                    }
+
+                    const result = await res.json()
+                    onAnalysisComplete(result)
+
+                    if (currentUser) {
+                      await saveAnalysis({
+                        platforms: selectedPlatforms,
+                        objective: selectedObjective,
+                        filesSummary: selectedPlatforms.map(p => ({
+                          platform: p,
+                          rows: uploadedFiles[p]?.rows || 0,
+                          tier: fileValidation[p]?.tier || 0
+                        }))
+                      })
+                    }
+
+                    window.location.href = '#dashboard'
+
+                  } catch (err) {
+                    console.error('Analysis failed:', err)
+                    setError(err.message)
+                  } finally {
+                    setIsLoading(false)
                   }
-                  window.location.href = '#dashboard'
-                } catch (err) {
-                  console.error('Analysis failed:', err)
-                }
-              }}
+                }}
+                disabled={!canRunAnalysis || isLoading}
                 className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white text-lg transition-all hover:opacity-90 hover:scale-105"
-                style={{ backgroundColor: '#6C63FF' }}>
-                🚀 Run Analysis
+                style={{ 
+                  backgroundColor: canRunAnalysis && !isLoading ? '#6C63FF' : '#24243A',
+                  cursor: canRunAnalysis && !isLoading ? 'pointer' : 'not-allowed'
+                }}>
+                {isLoading ? '⏳ Analyzing...' : '🚀 Run Analysis'}
               </button>
+
+              {error && (
+                <div className="mt-4 p-3 rounded-lg flex items-center gap-2"
+                  style={{ backgroundColor: '#7f1d1d33', border: '1px solid #f8717133' }}>
+                  <FiAlertCircle className="text-red-400" size={16} />
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
