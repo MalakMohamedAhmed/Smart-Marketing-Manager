@@ -12,26 +12,31 @@ import Footer from './components/Footer'
 function AppContent() {
   const { currentUser, isGuest } = useAuth()
   const [showLogin, setShowLogin] = useState(false)
-  const [analysisResult, setAnalysisResult] = useState(null)
-  console.log('analysisResult:', analysisResult)
-  
+  const [analysisData, setAnalysisData] = useState(null)
+
   if (showLogin && !currentUser && !isGuest) {
     return <Login onBack={() => setShowLogin(false)} />
   }
+
   return (
-    <div className="min-h-screen" style={{backgroundColor: '#0F0F13'}}>
+    <div className="min-h-screen" style={{ backgroundColor: '#0F0F13' }}>
       <Navbar onLoginClick={() => setShowLogin(true)} />
       <section id="hero"><Hero onLoginClick={() => setShowLogin(true)} /></section>
       <section id="features"><Features /></section>
-      <section id="upload"><Upload onAnalysisComplete={setAnalysisResult} /></section>
-      <section id="dashboard"><Dashboard data={analysisResult} /></section>
+      <section id="upload">
+        <Upload onAnalysisComplete={(data) => setAnalysisData(data)} />
+      </section>
+      <section id="dashboard">
+        <Dashboard analysisData={analysisData} />
+      </section>
       <section id="recommendations">
-        <Recommendations data={analysisResult} />
+        <Recommendations analysisData={analysisData} />
       </section>
       <Footer />
     </div>
   )
 }
+
 export default function App() {
   return (
     <AuthProvider>

@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import { FiUploadCloud, FiX, FiCheck, FiArrowRight, FiArrowLeft, FiAlertCircle, FiInfo } from 'react-icons/fi'
+import { FiUploadCloud, FiX, FiCheck, FiArrowRight, FiArrowLeft, FiAlertCircle, FiInfo, FiRefreshCw } from 'react-icons/fi'
 import { useAnalyses } from '../hooks/useAnalyses'
 import { useAuth } from '../context/AuthContext'
 
@@ -7,17 +7,20 @@ const platforms = ["Facebook", "Google", "Instagram", "TikTok", "YouTube", "Twit
 
 const objectives = ["Brand Awareness", "Lead Generation", "Conversions / Sales", "Traffic / Website Visits", "App Installs", "Engagement"]
 
-
-
 const platformMappings = {
-  Facebook: { 'Campaign Name': 'campaign_name', 'Amount Spent': 'spend', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Reach': 'reach', 'Frequency': 'frequency', 'CPM': 'cpm', 'CTR': 'ctr', 'CPC': 'cpc', 'Date': 'date', 'Budget': 'budget' },
-  Google: { 'Campaign': 'campaign_name', 'Cost': 'spend', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'CTR': 'ctr', 'Avg. CPC': 'cpc', 'Date': 'date', 'Budget': 'budget' },
-  TikTok: { 'Campaign name': 'campaign_name', 'Cost': 'spend', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Video views': 'video_views', 'CTR': 'ctr', 'CPC': 'cpc', 'Date': 'date' },
-  Instagram: { 'Campaign Name': 'campaign_name', 'Amount Spent': 'spend', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Reach': 'reach', 'CTR': 'ctr', 'Date': 'date' },
-  default: { 'campaign_name': 'campaign_name', 'spend': 'spend', 'impressions': 'impressions', 'clicks': 'clicks', 'conversions': 'conversions', 'ctr': 'ctr', 'cpc': 'cpc', 'date': 'date', 'budget': 'budget' }
+  Facebook: { 'Campaign Name': 'campaign_name', 'Amount Spent': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Reach': 'reach', 'Frequency': 'frequency', 'CPM': 'cpm', 'CTR': 'ctr', 'CPC': 'cpc', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue', 'Video Views': 'video_views', 'Engagement Score': 'engagement_score', 'Campaign Type': 'campaign_type', 'Target Audience': 'target_audience', 'Customer Segment': 'customer_segment', 'Language': 'language', 'Purchases': 'purchases', 'Leads': 'leads' },
+  Google: { 'Campaign': 'campaign_name', 'Cost': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'CTR': 'ctr', 'Avg. CPC': 'cpc', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue', 'Campaign Type': 'campaign_type', 'Target Audience': 'target_audience', 'Customer Segment': 'customer_segment', 'Language': 'language', 'Purchases': 'purchases', 'Leads': 'leads' },
+  TikTok: { 'Campaign name': 'campaign_name', 'Cost': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Video views': 'video_views', 'CTR': 'ctr', 'CPC': 'cpc', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue', 'Campaign Type': 'campaign_type', 'Target Audience': 'target_audience', 'Customer Segment': 'customer_segment', 'Language': 'language' },
+  Instagram: { 'Campaign Name': 'campaign_name', 'Amount Spent': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Reach': 'reach', 'CTR': 'ctr', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue', 'Campaign Type': 'campaign_type', 'Target Audience': 'target_audience', 'Customer Segment': 'customer_segment', 'Language': 'language' },
+  YouTube: { 'Campaign': 'campaign_name', 'Cost': 'acquisition_cost', 'Impressions': 'impressions', 'Views': 'video_views', 'Clicks': 'clicks', 'Conversions': 'conversions', 'CTR': 'ctr', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue' },
+  Twitter: { 'Campaign Name': 'campaign_name', 'Spend': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'CTR': 'ctr', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue' },
+  Pinterest: { 'Campaign': 'campaign_name', 'Spend': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'CTR': 'ctr', 'Date': 'date', 'Budget': 'budget' },
+  WhatsApp: { 'Campaign Name': 'campaign_name', 'Cost': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Date': 'date', 'Budget': 'budget' },
+  Email: { 'Campaign Name': 'campaign_name', 'Cost': 'acquisition_cost', 'Impressions': 'impressions', 'Clicks': 'clicks', 'Conversions': 'conversions', 'Open Rate': 'ctr', 'Date': 'date', 'Budget': 'budget', 'Revenue': 'revenue' },
+  default: { 'campaign_name': 'campaign_name', 'spend': 'acquisition_cost', 'acquisition_cost': 'acquisition_cost', 'impressions': 'impressions', 'clicks': 'clicks', 'conversions': 'conversions', 'ctr': 'ctr', 'cpc': 'cpc', 'date': 'date', 'budget': 'budget', 'revenue': 'revenue', 'Platform': 'platform', 'platform': 'platform' }
 }
 
-const TIER1 = ['impressions', 'clicks', 'spend', 'conversions']
+const TIER1 = ['impressions', 'clicks', 'acquisition_cost', 'conversions']
 const TIER2 = [...TIER1, 'date', 'budget', 'ctr']
 const TIER3 = [...TIER2, 'video_views', 'reach', 'frequency', 'cpm']
 
@@ -46,24 +49,44 @@ const tierConfig = {
   3: { label: 'Tier 3 — Rich Insights', color: '#6C63FF', bg: '#6C63FF22', desc: 'Complete data. Maximum recommendations.' },
 }
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://your-backend.hf.space'
+
+const initialState = {
+  step: 1,
+  selectedPlatforms: [],
+  fileMode: null,
+  uploadedFiles: {},
+  fileValidation: {},
+  selectedObjective: '',
+  dragOver: null,
+  combinedPlatformColumn: '',
+  analysisError: null,
+  isAnalyzing: false,
+}
+
 export default function Upload({ onAnalysisComplete }) {
-  const [step, setStep] = useState(1)
-  const [selectedPlatforms, setSelectedPlatforms] = useState([])
-  const [fileMode, setFileMode] = useState(null)
-  const [uploadedFiles, setUploadedFiles] = useState({})
-  const [fileValidation, setFileValidation] = useState({})
-  const [selectedObjective, setSelectedObjective] = useState('')
-  const [dragOver, setDragOver] = useState(null)
-  const [combinedPlatformColumn, setCombinedPlatformColumn] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [state, setState] = useState(initialState)
   const { saveAnalysis } = useAnalyses()
   const { currentUser } = useAuth()
 
+  const { step, selectedPlatforms, fileMode, uploadedFiles, fileValidation,
+    selectedObjective, dragOver, combinedPlatformColumn, analysisError, isAnalyzing } = state
+
+  const set = (updates) => setState(prev => ({ ...prev, ...updates }))
+
+  // FULL RESET
+  const resetAll = () => setState(initialState)
+
   const togglePlatform = (p) => {
-    setSelectedPlatforms(prev =>
-      prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]
-    )
+    set({
+      selectedPlatforms: selectedPlatforms.includes(p)
+        ? selectedPlatforms.filter(x => x !== p)
+        : [...selectedPlatforms, p],
+      uploadedFiles: {},
+      fileValidation: {},
+      fileMode: null,
+      analysisError: null,
+    })
   }
 
   const handleFileUpload = async (platform, file) => {
@@ -74,13 +97,30 @@ export default function Upload({ onAnalysisComplete }) {
     const tier = detectTier(mapped)
     const missingTier1 = TIER1.filter(f => !mapped.map(c => c.toLowerCase()).includes(f))
     const rows = text.split('\n').filter(r => r.trim()).length - 1
-    setUploadedFiles(prev => ({ ...prev, [platform]: { name: file.name, headers, mapped, rows, file } }))
-    setFileValidation(prev => ({ ...prev, [platform]: { tier, missingTier1, headers, mapped } }))
+
+    set({
+      uploadedFiles: { ...uploadedFiles, [platform]: { name: file.name, headers, mapped, rows, raw: text } },
+      fileValidation: { ...fileValidation, [platform]: { tier, missingTier1, headers, mapped } },
+      analysisError: null,
+    })
   }
 
   const removeFile = (platform) => {
-    setUploadedFiles(prev => { const u = { ...prev }; delete u[platform]; return u })
-    setFileValidation(prev => { const u = { ...prev }; delete u[platform]; return u })
+    const newFiles = { ...uploadedFiles }
+    const newVal = { ...fileValidation }
+    delete newFiles[platform]
+    delete newVal[platform]
+    set({ uploadedFiles: newFiles, fileValidation: newVal, analysisError: null })
+  }
+
+  const goBack = (targetStep) => {
+    set({
+      step: targetStep,
+      analysisError: null,
+      uploadedFiles: targetStep <= 2 ? {} : uploadedFiles,
+      fileValidation: targetStep <= 2 ? {} : fileValidation,
+      fileMode: targetStep <= 1 ? null : fileMode,
+    })
   }
 
   const canProceedStep1 = selectedPlatforms.length > 0
@@ -89,15 +129,76 @@ export default function Upload({ onAnalysisComplete }) {
     selectedPlatforms.every(p => fileValidation[p]?.tier >= 1)
   const canRunAnalysis = canProceedStep3 && selectedObjective !== ''
 
+  const runAnalysis = async () => {
+    set({ isAnalyzing: true, analysisError: null })
+    try {
+      const formData = new FormData()
+      selectedPlatforms.forEach(p => formData.append('platforms', p))
+      selectedPlatforms.forEach(p => {
+        const file = uploadedFiles[p]
+        if (file?.raw) {
+          const blob = new Blob([file.raw], { type: 'text/csv' })
+          formData.append(`file_${p.toLowerCase()}`, blob, file.name)
+        }
+      })
+      formData.append('objective', selectedObjective)
+
+      const res = await fetch(`${BACKEND_URL}/analyze`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Analysis failed')
+      }
+
+      const data = await res.json()
+
+      if (currentUser) {
+        await saveAnalysis({
+          platforms: selectedPlatforms,
+          objective: selectedObjective,
+          filesSummary: selectedPlatforms.map(p => ({
+            platform: p,
+            rows: uploadedFiles[p]?.rows || 0,
+            tier: fileValidation[p]?.tier || 0
+          }))
+        })
+      }
+
+      onAnalysisComplete(data)
+      window.location.href = '#dashboard'
+
+    } catch (err) {
+      set({ analysisError: err.message })
+    } finally {
+      set({ isAnalyzing: false })
+    }
+  }
+
   return (
     <div className="py-24 px-6" style={{ backgroundColor: '#1A1A24' }}>
       <div className="max-w-4xl mx-auto">
 
+        {/* Header */}
         <div className="text-center mb-12">
           <p className="text-sm font-semibold mb-3" style={{ color: '#6C63FF' }}>GET STARTED</p>
           <h2 className="text-4xl font-bold text-white mb-4">Analyze Your Campaigns</h2>
           <p className="text-gray-400">Follow the steps below to get AI-powered insights.</p>
         </div>
+
+        {/* New Analysis Button — shows after step 1 */}
+        {step > 1 && (
+          <div className="flex justify-end mb-4">
+            <button onClick={resetAll}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all hover:text-white"
+              style={{ backgroundColor: '#24243A', color: '#9ca3af', border: '1px solid #2E2E4A' }}>
+              <FiRefreshCw size={14} />
+              Start New Analysis
+            </button>
+          </div>
+        )}
 
         {/* Progress Bar */}
         <div className="flex items-center justify-center gap-2 mb-10">
@@ -146,7 +247,7 @@ export default function Upload({ onAnalysisComplete }) {
               ))}
             </div>
             <div className="flex justify-end">
-              <button onClick={() => setStep(selectedPlatforms.length === 1 ? 3 : 2)}
+              <button onClick={() => set({ step: selectedPlatforms.length === 1 ? 3 : 2 })}
                 disabled={!canProceedStep1}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
                 style={{
@@ -170,7 +271,7 @@ export default function Upload({ onAnalysisComplete }) {
                 { value: 'separate', title: 'One file per platform', desc: 'I have a separate CSV for each platform I selected.' },
                 { value: 'combined', title: 'One file for all platforms', desc: 'I have a single CSV that contains data from all platforms.' }
               ].map(opt => (
-                <button key={opt.value} onClick={() => setFileMode(opt.value)}
+                <button key={opt.value} onClick={() => set({ fileMode: opt.value, uploadedFiles: {}, fileValidation: {} })}
                   className="p-6 rounded-xl text-left transition-all hover:scale-[1.02]"
                   style={{
                     backgroundColor: fileMode === opt.value ? '#24243A' : '#1A1A24',
@@ -190,10 +291,10 @@ export default function Upload({ onAnalysisComplete }) {
               ))}
             </div>
             <div className="flex justify-between">
-              <button onClick={() => setStep(1)} className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
+              <button onClick={() => goBack(1)} className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
                 <FiArrowLeft /> Back
               </button>
-              <button onClick={() => setStep(3)} disabled={!canProceedStep2}
+              <button onClick={() => set({ step: 3 })} disabled={!canProceedStep2}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
                 style={{
                   backgroundColor: canProceedStep2 ? '#6C63FF' : '#24243A',
@@ -233,9 +334,9 @@ export default function Upload({ onAnalysisComplete }) {
                 ) : (
                   <label className="block p-8 rounded-xl text-center cursor-pointer transition-all"
                     style={{ border: `2px dashed ${dragOver === 'combined' ? '#6C63FF' : '#2E2E4A'}`, backgroundColor: dragOver === 'combined' ? '#24243A' : '#1A1A24' }}
-                    onDragOver={e => { e.preventDefault(); setDragOver('combined') }}
-                    onDragLeave={() => setDragOver(null)}
-                    onDrop={e => { e.preventDefault(); setDragOver(null); handleFileUpload('combined', e.dataTransfer.files[0]) }}>
+                    onDragOver={e => { e.preventDefault(); set({ dragOver: 'combined' }) }}
+                    onDragLeave={() => set({ dragOver: null })}
+                    onDrop={e => { e.preventDefault(); set({ dragOver: null }); handleFileUpload('combined', e.dataTransfer.files[0]) }}>
                     <input type="file" accept=".csv" className="hidden" onChange={e => handleFileUpload('combined', e.target.files[0])} />
                     <FiUploadCloud className="mx-auto mb-3 text-gray-500" size={32} />
                     <p className="text-gray-300 font-medium">Drop your CSV here or click to browse</p>
@@ -244,13 +345,15 @@ export default function Upload({ onAnalysisComplete }) {
                 )}
                 {uploadedFiles['combined'] && (
                   <div className="mt-4">
-                    <label className="block text-gray-400 text-sm mb-2">Which column identifies the platform?</label>
+                    <label className="block text-gray-300 text-sm font-medium mb-2">Which column identifies the platform?</label>
                     <select value={combinedPlatformColumn}
-                      onChange={e => setCombinedPlatformColumn(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl text-white outline-none"
-                      style={{ backgroundColor: '#24243A', border: '1px solid #2E2E4A' }}>
-                      <option value="">Select column...</option>
-                      {uploadedFiles['combined']?.headers?.map(h => <option key={h} value={h}>{h}</option>)}
+                      onChange={e => set({ combinedPlatformColumn: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl text-white text-base outline-none"
+                      style={{ backgroundColor: '#24243A', border: '1px solid #6C63FF' }}>
+                      <option value="" style={{ fontSize: '14px' }}>Select column...</option>
+                      {uploadedFiles['combined']?.headers?.map(h => (
+                        <option key={h} value={h} style={{ fontSize: '14px', padding: '8px' }}>{h}</option>
+                      ))}
                     </select>
                   </div>
                 )}
@@ -274,9 +377,9 @@ export default function Upload({ onAnalysisComplete }) {
                     ) : (
                       <label className="block p-4 rounded-xl text-center cursor-pointer transition-all"
                         style={{ border: `2px dashed ${dragOver === platform ? '#6C63FF' : '#2E2E4A'}`, backgroundColor: dragOver === platform ? '#24243A' : '#1A1A24' }}
-                        onDragOver={e => { e.preventDefault(); setDragOver(platform) }}
-                        onDragLeave={() => setDragOver(null)}
-                        onDrop={e => { e.preventDefault(); setDragOver(null); handleFileUpload(platform, e.dataTransfer.files[0]) }}>
+                        onDragOver={e => { e.preventDefault(); set({ dragOver: platform }) }}
+                        onDragLeave={() => set({ dragOver: null })}
+                        onDrop={e => { e.preventDefault(); set({ dragOver: null }); handleFileUpload(platform, e.dataTransfer.files[0]) }}>
                         <input type="file" accept=".csv" className="hidden" onChange={e => handleFileUpload(platform, e.target.files[0])} />
                         <FiUploadCloud className="mx-auto mb-2 text-gray-500" size={24} />
                         <p className="text-gray-400 text-sm font-medium">{platform}</p>
@@ -289,11 +392,11 @@ export default function Upload({ onAnalysisComplete }) {
             )}
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(selectedPlatforms.length === 1 ? 1 : 2)}
+              <button onClick={() => goBack(selectedPlatforms.length === 1 ? 1 : 2)}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
                 <FiArrowLeft /> Back
               </button>
-              <button onClick={() => setStep(4)} disabled={!canProceedStep3}
+              <button onClick={() => set({ step: 4 })} disabled={!canProceedStep3}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
                 style={{
                   backgroundColor: canProceedStep3 ? '#6C63FF' : '#24243A',
@@ -323,7 +426,7 @@ export default function Upload({ onAnalysisComplete }) {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <p className="text-white font-semibold">{platform}</p>
-                        <span className="text-xs px-2 py-1 text-gray-400">{file.name}</span>
+                        <span className="text-xs text-gray-400">{file.name}</span>
                       </div>
                       <span className="text-xs px-3 py-1 rounded-full font-medium"
                         style={{ backgroundColor: tc.bg, color: tc.color }}>
@@ -336,7 +439,7 @@ export default function Upload({ onAnalysisComplete }) {
                         style={{ backgroundColor: '#7f1d1d33', border: '1px solid #f8717133' }}>
                         <FiAlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={16} />
                         <p className="text-red-400 text-sm">
-                          Missing critical columns: <strong>{val.missingTier1.join(', ')}</strong>
+                          Missing critical columns: <strong>{val.missingTier1.join(', ')}</strong>. Please fix your CSV and re-upload.
                         </p>
                       </div>
                     )}
@@ -361,7 +464,7 @@ export default function Upload({ onAnalysisComplete }) {
               <h4 className="text-white font-semibold mb-3">Campaign Objective</h4>
               <div className="flex flex-wrap gap-3">
                 {objectives.map(obj => (
-                  <button key={obj} onClick={() => setSelectedObjective(obj)}
+                  <button key={obj} onClick={() => set({ selectedObjective: obj })}
                     className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
                     style={{
                       backgroundColor: selectedObjective === obj ? '#6C63FF' : '#24243A',
@@ -375,10 +478,10 @@ export default function Upload({ onAnalysisComplete }) {
             </div>
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(3)} className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
+              <button onClick={() => goBack(3)} className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
                 <FiArrowLeft /> Back
               </button>
-              <button onClick={() => setStep(5)} disabled={!canRunAnalysis}
+              <button onClick={() => set({ step: 5 })} disabled={!canRunAnalysis}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all"
                 style={{
                   backgroundColor: canRunAnalysis ? '#6C63FF' : '#24243A',
@@ -393,123 +496,64 @@ export default function Upload({ onAnalysisComplete }) {
 
         {/* STEP 5 */}
         {step === 5 && (
-          <div className="p-8 rounded-2xl" style={{ backgroundColor: '#0F0F13', border: '1px solid #2E2E4A' }}>
-            <h3 className="text-white font-bold text-xl mb-2">Ready to Analyze</h3>
-            <p className="text-gray-400 text-sm mb-6">Here's a summary of what will be analyzed.</p>
+          <div>
+            <div className="p-8 rounded-2xl" style={{ backgroundColor: '#0F0F13', border: '1px solid #2E2E4A' }}>
+              <h3 className="text-white font-bold text-xl mb-2">Ready to Analyze</h3>
+              <p className="text-gray-400 text-sm mb-6">Here's a summary of what will be analyzed.</p>
 
-            <div className="flex flex-col gap-3 mb-8">
-              {selectedPlatforms.map(platform => {
-                const val = fileValidation[platform]
-                const file = uploadedFiles[platform]
-                const tc = tierConfig[val?.tier || 0]
-                return (
-                  <div key={platform} className="flex items-center justify-between p-4 rounded-xl"
-                    style={{ backgroundColor: '#1A1A24', border: '1px solid #2E2E4A' }}>
-                    <div className="flex items-center gap-3">
-                      <FiCheck className="text-green-400" size={18} />
-                      <div>
-                        <p className="text-white font-medium">{platform}</p>
-                        <p className="text-gray-400 text-xs">{file?.name} · {file?.rows} rows · {val?.mapped?.length} features</p>
+              <div className="flex flex-col gap-3 mb-8">
+                {selectedPlatforms.map(platform => {
+                  const val = fileValidation[platform]
+                  const file = uploadedFiles[platform]
+                  const tc = tierConfig[val?.tier || 0]
+                  return (
+                    <div key={platform} className="flex items-center justify-between p-4 rounded-xl"
+                      style={{ backgroundColor: '#1A1A24', border: '1px solid #2E2E4A' }}>
+                      <div className="flex items-center gap-3">
+                        <FiCheck className="text-green-400" size={18} />
+                        <div>
+                          <p className="text-white font-medium">{platform}</p>
+                          <p className="text-gray-400 text-xs">{file?.name} · {file?.rows} rows · {val?.mapped?.length} features</p>
+                        </div>
                       </div>
+                      <span className="text-xs px-3 py-1 rounded-full font-medium"
+                        style={{ backgroundColor: tc.bg, color: tc.color }}>
+                        {tc.label}
+                      </span>
                     </div>
-                    <span className="text-xs px-3 py-1 rounded-full font-medium"
-                      style={{ backgroundColor: tc.bg, color: tc.color }}>
-                      {tc.label}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
 
-            <div className="p-4 rounded-xl mb-8 flex items-center gap-3"
-              style={{ backgroundColor: '#24243A', border: '1px solid #2E2E4A' }}>
-              <FiInfo className="text-gray-400 flex-shrink-0" size={18} />
-              <div>
-                <p className="text-white text-sm font-medium">Objective: {selectedObjective}</p>
-                <p className="text-gray-400 text-xs mt-0.5">Recommendations will be tailored to this goal</p>
+              <div className="p-4 rounded-xl mb-8 flex items-center gap-3"
+                style={{ backgroundColor: '#24243A', border: '1px solid #2E2E4A' }}>
+                <FiInfo className="text-gray-400 flex-shrink-0" size={18} />
+                <div>
+                  <p className="text-white text-sm font-medium">Objective: {selectedObjective}</p>
+                  <p className="text-gray-400 text-xs mt-0.5">Recommendations will be tailored to this goal</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between">
+                <button onClick={() => goBack(4)} className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
+                  <FiArrowLeft /> Back
+                </button>
+                <button onClick={runAnalysis} disabled={isAnalyzing}
+                  className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white text-lg transition-all hover:opacity-90 hover:scale-105"
+                  style={{ backgroundColor: '#6C63FF', opacity: isAnalyzing ? 0.7 : 1 }}>
+                  {isAnalyzing ? '⏳ Analyzing...' : '🚀 Run Analysis'}
+                </button>
               </div>
             </div>
 
-            <div className="flex justify-between">
-              <button onClick={() => setStep(4)} className="flex items-center gap-2 px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">
-                <FiArrowLeft /> Back
-              </button>
-              <button
-                onClick={async () => {
-                  setIsLoading(true)
-                  setError(null)
-                  try {
-                    const formData = new FormData()
-                    selectedPlatforms.forEach(p => formData.append('platforms', p))
-                    formData.append('file_mode', fileMode === 'combined' ? 'one_for_all' : 'one_per_platform')
-                    formData.append('objective', selectedObjective)
-
-                    if (fileMode === 'combined') {
-                      if (uploadedFiles['combined']?.file) {
-                        formData.append('file_all', uploadedFiles['combined'].file)
-                      }
-                      if (combinedPlatformColumn) {
-                        formData.append('platform_col', combinedPlatformColumn)
-                      }
-                    } else {
-                      selectedPlatforms.forEach(p => {
-                        if (uploadedFiles[p]?.file) {
-                          formData.append(`file_${p.toLowerCase()}`, uploadedFiles[p].file)
-                        }
-                      })
-                    }
-
-                    const res = await fetch('https://malakmohamed21-smart-campaign-backend.hf.space/analyze', {
-                      method: 'POST',
-                      body: formData
-                    })
-
-                    if (!res.ok) {
-                      const errData = await res.json()
-                      throw new Error(errData.message || errData.error || 'Analysis failed')
-                    }
-
-                    const result = await res.json()
-                    onAnalysisComplete(result)
-
-                    if (currentUser) {
-                      await saveAnalysis({
-                        platforms: selectedPlatforms,
-                        objective: selectedObjective,
-                        filesSummary: selectedPlatforms.map(p => ({
-                          platform: p,
-                          rows: uploadedFiles[p]?.rows || 0,
-                          tier: fileValidation[p]?.tier || 0
-                        }))
-                      })
-                    }
-
-                    window.location.href = '#dashboard'
-
-                  } catch (err) {
-                    console.error('Analysis failed:', err)
-                    setError(err.message)
-                  } finally {
-                    setIsLoading(false)
-                  }
-                }}
-                disabled={!canRunAnalysis || isLoading}
-                className="flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white text-lg transition-all hover:opacity-90 hover:scale-105"
-                style={{ 
-                  backgroundColor: canRunAnalysis && !isLoading ? '#6C63FF' : '#24243A',
-                  cursor: canRunAnalysis && !isLoading ? 'pointer' : 'not-allowed'
-                }}>
-                {isLoading ? '⏳ Analyzing...' : '🚀 Run Analysis'}
-              </button>
-
-              {error && (
-                <div className="mt-4 p-3 rounded-lg flex items-center gap-2"
-                  style={{ backgroundColor: '#7f1d1d33', border: '1px solid #f8717133' }}>
-                  <FiAlertCircle className="text-red-400" size={16} />
-                  <p className="text-red-400 text-sm">{error}</p>
-                </div>
-              )}
-            </div>
+            {/* Error shown BELOW the card */}
+            {analysisError && (
+              <div className="mt-4 flex items-start gap-2 p-4 rounded-xl"
+                style={{ backgroundColor: '#7f1d1d33', border: '1px solid #f8717133' }}>
+                <FiAlertCircle className="text-red-400 flex-shrink-0 mt-0.5" size={16} />
+                <p className="text-red-400 text-sm">{analysisError}</p>
+              </div>
+            )}
           </div>
         )}
 
