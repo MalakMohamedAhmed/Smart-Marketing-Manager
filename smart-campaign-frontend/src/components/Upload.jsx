@@ -49,7 +49,7 @@ const tierConfig = {
   3: { label: 'Tier 3 — Rich Insights', color: '#6C63FF', bg: '#6C63FF22', desc: 'Complete data. Maximum recommendations.' },
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://your-backend.hf.space'
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://MalakMohamed21-smart-campaign-backend.hf.space'
 
 const initialState = {
   step: 1,
