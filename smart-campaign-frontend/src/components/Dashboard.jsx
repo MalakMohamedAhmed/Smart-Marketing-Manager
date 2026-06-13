@@ -57,6 +57,8 @@ export default function Dashboard({ data }) {
     conversions: c.conversions || 0,
   }))
 
+  console.log('chartData:', chartData)
+
   return (
     <div className="py-24 px-6" style={{ backgroundColor: '#0F0F13' }}>
       <div className="max-w-6xl mx-auto">
