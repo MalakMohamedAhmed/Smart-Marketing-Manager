@@ -53,7 +53,7 @@ export default function Dashboard({ data }) {
   // Build chart data from real campaigns
   const chartData = data.campaigns.map(c => ({
     month: c.campaign_name,
-    roi: Math.round((c.roi || 0) * 100),
+    roi: c.acquisition_cost > 0 ? Math.round(((c.revenue - c.acquisition_cost) / c.acquisition_cost) * 100) : 0,
     conversions: c.conversions || 0,
   }))
 
