@@ -130,8 +130,10 @@ export default function Upload({ onAnalysisComplete }) {
   const canRunAnalysis = canProceedStep3 && selectedObjective !== ''
 
   const runAnalysis = async () => {
+    console.log('runAnalysis called')
     set({ isAnalyzing: true, analysisError: null })
     try {
+      console.log('Building formData...')
       const formData = new FormData()
       selectedPlatforms.forEach(p => formData.append('platforms', p))
       selectedPlatforms.forEach(p => {
@@ -143,10 +145,13 @@ export default function Upload({ onAnalysisComplete }) {
       })
       formData.append('objective', selectedObjective)
 
+      console.log('Sending request to:', `${BACKEND_URL}/analyze`)
       const res = await fetch(`${BACKEND_URL}/analyze`, {
         method: 'POST',
         body: formData,
       })
+
+      console.log('Response status:', res.status)
 
       if (!res.ok) {
         const err = await res.json()
@@ -154,30 +159,20 @@ export default function Upload({ onAnalysisComplete }) {
       }
 
       const data = await res.json()
-      console.log('API Response:', data) // ADD THIS
-
-      if (currentUser) {
-        await saveAnalysis({
-          platforms: selectedPlatforms,
-          objective: selectedObjective,
-          filesSummary: selectedPlatforms.map(p => ({
-            platform: p,
-            rows: uploadedFiles[p]?.rows || 0,
-            tier: fileValidation[p]?.tier || 0
-          }))
-        })
-      }
-
+      console.log('API Response:', data)
+      console.log('Calling onAnalysisComplete...')
       onAnalysisComplete(data)
+      console.log('Redirecting to dashboard...')
       window.location.href = '#dashboard'
 
     } catch (err) {
+      console.error('Error:', err)
       set({ analysisError: err.message })
     } finally {
       set({ isAnalyzing: false })
     }
   }
-
+  
   return (
     <div className="py-24 px-6" style={{ backgroundColor: '#1A1A24' }}>
       <div className="max-w-4xl mx-auto">
