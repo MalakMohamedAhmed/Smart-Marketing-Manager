@@ -184,11 +184,15 @@ def analyze():
             clean = [v for v in vals if v is not None and not np.isnan(float(v))]
             return float(np.mean(clean)) if clean else 0.0
 
-        total_spend       = sum(c.get("acquisition_cost") or 0 for c in all_campaigns)
-        total_conversions = sum(c.get("conversions") or 0 for c in all_campaigns)
-        total_revenue     = sum(c.get("revenue") or 0 for c in all_campaigns)
-        avg_roi           = safe_mean([c.get("roi") for c in all_campaigns])
-        avg_ctr           = safe_mean([c.get("ctr") for c in all_campaigns])
+        total_spend = sum(c.get("acquisition_cost", 0) for c in all_campaigns)
+        total_conversions = sum(c.get("conversions", 0) for c in all_campaigns)
+        total_revenue = sum(c.get("revenue", 0) for c in all_campaigns)
+        if total_spend > 0 and total_revenue > 0:
+            avg_roi = ((total_revenue - total_spend) / total_spend) * 100
+        else:
+            avg_roi = float(np.mean([c.get("roi", 0) * 100 for c in all_campaigns]))
+
+        avg_ctr = float(np.mean([c.get("ctr", 0) * 100 for c in all_campaigns])) if all_campaigns else 0
 
         # ── Platform summary for dashboard ───────────────────────────
         platform_summary = {}

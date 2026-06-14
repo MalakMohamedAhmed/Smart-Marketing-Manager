@@ -46,46 +46,59 @@ def load_artifacts():
     }
 
 def derive_features(df):
-    """Derive computed features from raw columns."""
     eps = 1e-9
-    df = df.copy()
-
+    
     # CTR
-    if "ctr" not in df.columns or df["ctr"].isna().all():
-        if "clicks" in df.columns and "impressions" in df.columns:
+    if "clicks" in df.columns and "impressions" in df.columns:
+        if "ctr" not in df.columns or df["ctr"].isna().all():
             df["ctr"] = df["clicks"] / (df["impressions"] + eps)
+        else:
+            df["ctr"] = df["ctr"].fillna(df["clicks"] / (df["impressions"] + eps))
 
-    # Conversion rate
-    if "conversion_rate" not in df.columns or df["conversion_rate"].isna().all():
-        if "conversions" in df.columns and "clicks" in df.columns:
+    # Conversion Rate
+    if "conversions" in df.columns and "clicks" in df.columns:
+        if "conversion_rate" not in df.columns or df["conversion_rate"].isna().all():
             df["conversion_rate"] = df["conversions"] / (df["clicks"] + eps)
 
     # CPC
-    if "cpc" not in df.columns or df["cpc"].isna().all():
-        if "acquisition_cost" in df.columns and "clicks" in df.columns:
+    if "acquisition_cost" in df.columns and "clicks" in df.columns:
+        if "cpc" not in df.columns or df["cpc"].isna().all():
             df["cpc"] = df["acquisition_cost"] / (df["clicks"] + eps)
 
     # CPM
-    if "cpm" not in df.columns or df["cpm"].isna().all():
-        if "acquisition_cost" in df.columns and "impressions" in df.columns:
+    if "acquisition_cost" in df.columns and "impressions" in df.columns:
+        if "cpm" not in df.columns or df["cpm"].isna().all():
             df["cpm"] = (df["acquisition_cost"] / (df["impressions"] + eps)) * 1000
 
     # CPR
-    if "cpr" not in df.columns or df["cpr"].isna().all():
-        if "acquisition_cost" in df.columns and "conversions" in df.columns:
-            df["cpr"] = df["acquisition_cost"] / (df["conversions"].clip(lower=1))
+    if "acquisition_cost" in df.columns and "conversions" in df.columns:
+        if "cpr" not in df.columns or df["cpr"].isna().all():
+            df["cpr"] = df["acquisition_cost"] / (df["conversions"] + eps)
 
-    # ROI
-    if "roi" not in df.columns or df["roi"].isna().all():
-        if "revenue" in df.columns and "acquisition_cost" in df.columns:
-            df["roi"] = (
-                (df["revenue"] - df["acquisition_cost"]) /
-                (df["acquisition_cost"] + eps)
-            )
+    # ROI — most important fix
+    if "revenue" in df.columns and "acquisition_cost" in df.columns:
+        mask = df["acquisition_cost"] > 0
+        if "roi" not in df.columns:
+            df["roi"] = 0.0
+        df.loc[mask, "roi"] = (
+            (df.loc[mask, "revenue"] - df.loc[mask, "acquisition_cost"]) /
+            df.loc[mask, "acquisition_cost"]
+        )
+    elif "conversions" in df.columns and "acquisition_cost" in df.columns:
+        # Estimate ROI from conversions if revenue not available
+        # Assume average order value of 50
+        avg_order_value = 50
+        mask = df["acquisition_cost"] > 0
+        if "roi" not in df.columns:
+            df["roi"] = 0.0
+        df.loc[mask, "roi"] = (
+            (df.loc[mask, "conversions"] * avg_order_value - df.loc[mask, "acquisition_cost"]) /
+            df.loc[mask, "acquisition_cost"]
+        )
 
     # Video view rate
-    if "video_view_rate" not in df.columns or df["video_view_rate"].isna().all():
-        if "video_views" in df.columns and "impressions" in df.columns:
+    if "video_views" in df.columns and "impressions" in df.columns:
+        if "video_view_rate" not in df.columns or df["video_view_rate"].isna().all():
             df["video_view_rate"] = df["video_views"] / (df["impressions"] + eps)
 
     return df
