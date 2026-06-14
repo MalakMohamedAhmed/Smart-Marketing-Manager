@@ -154,6 +154,7 @@ export default function Upload({ onAnalysisComplete }) {
       }
 
       const data = await res.json()
+      console.log('API Response:', data) // ADD THIS
 
       if (currentUser) {
         await saveAnalysis({
