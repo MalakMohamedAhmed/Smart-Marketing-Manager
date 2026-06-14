@@ -22,6 +22,14 @@ export default function Dashboard({ analysisData }) {
   const hasAudience = campaigns.some(c => c.target_audience && c.target_audience !== 0)
   const hasVideoViews = campaigns.some(c => c.video_views && c.video_views > 0)
   const hasDate = campaigns.some(c => c.month && c.month !== 0)
+  // Check if ROI varies enough to be worth showing
+  const roiValues = campaigns.map(c => (c.roi || 0) * 100)
+  const roiVariance = Math.max(...roiValues) - Math.min(...roiValues)
+  const hasRoiVariance = roiVariance > 1 // only show if difference > 1%
+
+  // Check if trend data varies enough
+  const trendVariance = trendData ? Math.max(...trendData.map(d => d.roi)) - Math.min(...trendData.map(d => d.roi)) : 0
+  const hasTrendVariance = trendVariance > 1
   const platforms = [...new Set(campaigns.map(c => c.platform))]
   const isMultiPlatform = platforms.length > 1
   const alertCount = campaigns.filter(c => c.alert_flag === 1).length
@@ -129,19 +137,21 @@ export default function Dashboard({ analysisData }) {
         </div>
 
         {/* SECTION 3 — Charts */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="p-6 rounded-2xl" style={{backgroundColor: '#1A1A24', border: '1px solid #2E2E4A'}}>
-            <h3 className="text-white font-semibold mb-6">ROI by Campaign</h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={roiChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E2E4A" />
-                <XAxis dataKey="name" stroke="#6b7280" tick={{fontSize: 11}} />
-                <YAxis stroke="#6b7280" tick={{fontSize: 11}} unit="%" />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, 'ROI']} />
-                <Bar dataKey="roi" fill="#6C63FF" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className={`grid grid-cols-1 ${hasRoiVariance ? 'md:grid-cols-2' : ''} gap-6 mb-8`}>
+          {hasRoiVariance && (
+            <div className="p-6 rounded-2xl" style={{backgroundColor: '#1A1A24', border: '1px solid #2E2E4A'}}>
+              <h3 className="text-white font-semibold mb-6">ROI by Campaign</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={roiChartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2E2E4A" />
+                  <XAxis dataKey="name" stroke="#6b7280" tick={{fontSize: 11}} />
+                  <YAxis stroke="#6b7280" tick={{fontSize: 11}} unit="%" />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, 'ROI']} />
+                  <Bar dataKey="roi" fill="#6C63FF" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
 
           <div className="p-6 rounded-2xl" style={{backgroundColor: '#1A1A24', border: '1px solid #2E2E4A'}}>
             <h3 className="text-white font-semibold mb-6">Conversions by Campaign</h3>
@@ -297,7 +307,7 @@ export default function Dashboard({ analysisData }) {
         )}
 
         {/* SECTION 7 — Performance Trends */}
-        {hasDate && trendData.length > 1 && (
+        {hasDate && hasTrendVariance && trendData.length > 1 && (
           <div className="mb-8">
             <h3 className="text-white font-bold text-xl mb-6">Performance Trends</h3>
             <div className="p-6 rounded-2xl" style={{backgroundColor: '#1A1A24', border: '1px solid #2E2E4A'}}>
